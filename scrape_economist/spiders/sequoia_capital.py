@@ -45,8 +45,8 @@ class SequoiaCapitalSpider(CrawlSpider):
         # Convert the timezone-naive datetime object to a timezone-aware one
         now_aware = now.replace(tzinfo=pytz.UTC)
 
-        # Check if the article is within a year
-        if now_aware - article_date <= timedelta(days=1000):
+        # Check if the article is within a week
+        if now_aware - article_date <= timedelta(days=7):
             # get title of article
             main_content = response.xpath('//main[@role="main"]')
             title = main_content.xpath('//h1/text()').get()
@@ -62,8 +62,8 @@ class SequoiaCapitalSpider(CrawlSpider):
                 'date': article_date,
                 'title': title,
                 'content': content,
+                'url': response.url
             }
 
-        else:  # Stop following the next page link when the first article older than 365 days is found
-            # Stop following the next page link when the first article older than a year is found
-            rules = rules[:1]  # Keep only the first rule (to follow the news article links)
+        else:  # Stop following the next page link when the first article older than 7 days is found
+            rules = rules[:1]
