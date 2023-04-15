@@ -62,7 +62,6 @@ class SequoiaCapitalSpider(CrawlSpider):
                 'date': article_date,
                 'title': title,
                 'content': content,
-                'url': response.url
             }
 
         else:  # Stop following the next page link when the first article older than 7 days is found
