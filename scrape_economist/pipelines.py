@@ -11,21 +11,22 @@ import os
 from itemadapter import ItemAdapter
 import logging
 
+
 class ScrapeEconomistPipeline:
     def process_item(self, item, spider):
         return item
 
+
 class MongodbPipeline:
     # this function run when spider starts
-    collection_name = 'sequoia capital'
+    collection_name = 'Economist'
 
     def __init__(self):
-        file_path = os.path.join(os.getcwd(), 'Data/mongobd.txt')
-        with open(file_path, 'r') as f:
-            self.data = f.read()
+        # you can set env variable in your shell with: export MY_API_KEY="your_api_key_here"
+        self.apy_key = os.environ.get('Mongodb_key')
 
     def open_spider(self, spider):
-        self.client = pymongo.MongoClient(self.data)
+        self.client = pymongo.MongoClient(self.apy_key)
         self.db = self.client['My_Database']
 
     # this function run when spider ends
@@ -35,4 +36,3 @@ class MongodbPipeline:
     def process_item(self, item, spider):
         self.db[self.collection_name].insert(item)
         return item
-

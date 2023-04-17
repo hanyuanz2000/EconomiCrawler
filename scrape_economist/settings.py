@@ -65,6 +65,9 @@ ROBOTSTXT_OBEY = False
 #ITEM_PIPELINES = {
 #    "scrape_economist.pipelines.ScrapeEconomistPipeline": 300,
 #}
+ITEM_PIPELINES = {
+   "scrape_economist.pipelines.MongodbPipeline": 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html

@@ -7,11 +7,11 @@ import pytz
 
 
 class SequoiaCapitalSpider(CrawlSpider):
-    name = "sequoia_capital"
+    name = "Andreessen_Horowitz"
     allowed_domains = ["www.economist.com"]
 
     # define search query
-    search_query_original = 'sequoia capital'
+    search_query_original = 'Andreessen_Horowitz'
 
     # replace space with + to fit into url format
     search_query = search_query_original.replace(" ", "+")
