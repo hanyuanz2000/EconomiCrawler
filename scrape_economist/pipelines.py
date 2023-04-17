@@ -23,10 +23,11 @@ class MongodbPipeline:
 
     def __init__(self):
         # you can set env variable in your shell with: export MY_API_KEY="your_api_key_here"
-        self.apy_key = os.environ.get('Mongodb_key')
+        self.connection_code = os.environ.get('Mongodb_key')
+        # self.connection_code = os.environ.get('Mongodb_connection_code')
 
     def open_spider(self, spider):
-        self.client = pymongo.MongoClient(self.apy_key)
+        self.client = pymongo.MongoClient(self.connection_code)
         self.db = self.client['My_Database']
 
     # this function run when spider ends

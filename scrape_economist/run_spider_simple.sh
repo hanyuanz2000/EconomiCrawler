@@ -22,4 +22,3 @@ cd "$scrapy_project_dir" || { echo "Error: Failed to change to Scrapy project di
 
 scrapy crawl sequoia_capital
 scrapy crawl Andreessen_Horowitz
-
