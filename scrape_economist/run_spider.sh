@@ -1,6 +1,8 @@
 #!/bin/bash
 
 TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+EMAIL="hanyuanz2000@gmail.com"
+SUBJECT="weekly scraping shell script output"
 LOGFILE="/Users/zhanghanyuan/PycharmProjects/scrape_economist/logs/logfile-${TIMESTAMP}.log"
 
 # Source system-wide environment variables
@@ -45,18 +47,27 @@ run_spider() {
     LOGFILE=$2
 
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Starting spider: $spider_name" >> "$LOGFILE"
-#    scrapy_output=$(scrapy crawl "$spider_name" -o output_data_local/test.csv --nolog -s LOG_LEVEL=ERROR 2>&1 | grep -E '^\[[0-9]+ [a-zA-Z]+\] (ERROR|INFO):')
-    scrapy_output=$(scrapy crawl "$spider_name" 2>&1)
+    scrapy_output=$(scrapy crawl "$spider_name" --nolog -s LOG_LEVEL=ERROR 2>&1 | grep -E '^\[[0-9]+ [a-zA-Z]+\] (ERROR|INFO):')
     echo "$scrapy_output" >> "$LOGFILE"
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Finished spider: $spider_name" >> "$LOGFILE"
 }
 
 # Run your Scrapy spiders
 run_spider "sequoia_capital" "$LOGFILE"
+echo " "
 run_spider "Andreessen_Horowitz" "$LOGFILE"
-
-echo "Weekly scraping finished!" | mail -s "Weekly scraping reminder" hanyuanzhang0502@outlook.com
 
 # Log the end of the script execution
 echo "$(date) - Script finished" >> "$LOGFILE"
+
+# Check if the mail command is installed
+if ! command -v mail &> /dev/null
+then
+    echo "mail command not found. Please install mailutils or similar package."
+    exit 1
+fi
+
+# Send the log file contents via email
+# shellcheck disable=SC2002
+cat "$LOGFILE" | mail -s "$SUBJECT" "$EMAIL"
 

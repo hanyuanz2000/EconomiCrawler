@@ -101,7 +101,7 @@ So we decide to modify the settings.py by adding: `ROBOTSTXT_OBEY = False`. Howe
 cautious while using this setting and ensure you are respecting the website's terms of service and privacy policies.
 You can try different approaches to solve this problem in your own spiders.
 
-## 3 How to Run Spiders and Store the scraping results in Different Locations?
+## 3 How to Run a Single Spider and Store the scraping results in Different Locations?
 The storage location of the web scraping output can be determined based on the size of the results; 
 it can either be stored locally or in the cloud.
 
@@ -109,7 +109,9 @@ it can either be stored locally or in the cloud.
 On certain occasions, we may need to perform local testing and store the scraped data locally. 
 To accomplish this, we can execute a command in the terminal, such as the following:
 
-`scrapy crawl sequoia_capital -o output_data_local/sequoia_capital.csv`
+```
+scrapy crawl sequoia_capital -o output_data_local/sequoia_capital.csv`
+```
 
 By running this command, we can run the spider named "sequoia_capital"
 and store the scraped data in the "output_data" folder [here](./output_data_local/sequoia_capital.csv) in csv format.
@@ -156,32 +158,52 @@ in the file and modify it to
 so that it matches the class name in pipelines.py.
 
 #### Mongodb Cloud
-This is a demonstration of the way data is stored in a MongoDB cloud database:
+Below is a demonstration of the way data is stored in a MongoDB cloud database after we run 
+
+```scrapy crawl sequoia_capital```
+
+after modifying the [pipeline.py](./scrape_economist/pipelines.py)
+ and [settings.py](./scrape_economist/settings.py). 
+
 ![alt text](Images_for_Readme/Mongodb.png)
 
 It should be noted that occasional errors may occur, such as the following:
 `pymongo.errors.ServerSelectionTimeoutError: localhost:27017: [Errno 61] Connection refused`
 To address this issue, we might need to manually start mongodb beforehand by:
 
-`brew services start mongodb-community@6.0`   
+```
+brew services start mongodb-community@6.0`   
+```
 
 To learn how to install mongodb on Apple M1 using Homebrew, you can refer to [this resource](https://stackoverflow.com/questions/65357744/how-to-install-mongodb-on-apple-m1-chip).
 
-## 5 Automatically Running Spiders
-To automate the execution of our spider and update our database on a weekly basis, 
-we can use a combination of a shell script and the Cron job scheduler.
+## 4 Automatically Running Multiple Spiders
+To automate the execution of our spiders and update our database on a weekly basis, 
+we can use a combination of a shell script and the cron job scheduler.
 
 ### Shell Script
-I provide 2 version of shell script. The advanced one can be found [here](./scrape_economist/run_spider_advanced.sh).
+There are two shell scripts we possibly need, which are all under [./scrape_economist](./scrape_economist) directory.
+
+The first one is [run_spider.sh](./scrape_economist/run_spider.sh).
 Essentially, it enables intended conda environment and runs all spiders in that environment. 
 Additionally, it has the capability to log execution details with timestamps
 and send email notifications upon completion of the scraping process.
 
+To manually execute the script, navigate to its directory and enter the command `bash run_spider.sh`.
 
-To manually execute the script, navigate to its directory and enter the command `bash run_spider_complex.sh`.
+The second one is env.sh, which include below content:
+
+```
+#!/bin/bash
+
+export MONGODB_URI='your mongodb connection code'
+export MONGODB_DB='My_Database'
+```
+
+I didn't push it to GitHub for the security consideration.
 
 Note that by default cron jobs are executed from the user's home directory. 
-Hence, the use of relative paths in shell script could be a common cause of cron issues.
+Hence, the use of relative paths in shell script could be a common cause of errors.
 In this case, we use absolute path in the shell script.
 
 ### Cron Job Scheduler
@@ -189,31 +211,53 @@ To use a cron job scheduler to execute a bash shell script weekly, we can follow
 #### step 1
 Give the script execute permissions using the chmod command: 
 
-`chmod +x run_spider_advanced.sh`
+```
+chmod +x /Users/zhanghanyuan/PycharmProjects/scrape_economist/scrape_economist/run_spider.sh
+```
+
+and
+
+```
+chmod +x /Users/zhanghanyuan/PycharmProjects/scrape_economist/scrape_economist/env.sh
+```
 
 #### step 2
 Open the crontab editor with `crontab -e` and add a new cron job:
 
-`* * * * * /path/to/your/script.sh`
+```
+1 0 * * 1 . /Users/zhanghanyuan/PycharmProjects/scrape_economist/scrape_economist/env.sh; /Users/zhanghanyuan/PycharmProjects/scrape_economist/scrape_economist/run_spider.sh
+```
 
 The first 5 fields (separated by spaces) represent 
 minutes (0-59), hours (0-23), days of the month (1-31), months (1-12), and days of the week (0-7, where both 0 and 7 represent Sunday).
+For instance, my setting enables the shell script automatically running every Monday at 0:01 AM
 
-My default is vi, and below are steps how I can modify my crontab files:
+My default text editor is vi, and below are steps how I can modify my crontab files:
 - Press i to enter insert mode, which allows you to edit the file
 - Navigate the file using the arrow keys and modify the lines as needed
 - Press Esc to exit insert mode
 - Save and exit the file by typing :wq followed by Enter
 
-Your default text editor could be nano, vim, or vi, each with different methods to edit and save files.
+Your default text editor could be nano, vim, or vi. 
+Finally, we can save and exit the file. If you want to check your job later, you can simply typing `crontab -l`
 
-For instance, in my computer, my setting would be
+However, it's important to note that using the cron job scheduler to insert new items into MongoDB Atlas 
+may not always be reliable. Despite adding the env.sh file to provide cron access to the environment variables, 
+the insertion of new items into the database may sometimes fail. In such cases, it's necessary to replace the line
 
-`1 0 * * 1 /Users/zhanghanyuan/PycharmProjects/scrape_economist/scrape_economist/run_spider_script.sh`
+`self.connection_code = os.environ.get('Mongodb_connection_code')`
 
-This enables automatically running the script every Monday at 0:01 AM
+with
 
-Finally, we can save and exit the file. Later when you want to check your job, you can simply typing `crontab -l`
+`self.connection_code = your actual connection code in string format`
+
+in [pipeline.py](./scrape_economist/pipelines.py). This can be somewhat inconvenient, 
+but not doing so may result in consistent failures when updating the cloud database. 
+Remember not to upload your actual connection code to publicly accessible platforms.
+
+One suggestion to address this instability is to store the scraped results locally first, 
+and then manually update them to MongoDB Atlas. 
+Alternatively, you can explore other cloud database options.
 
 ## 7 Conclusion
 That's pretty much end of it. Hope this readme file can help you better understand the code.

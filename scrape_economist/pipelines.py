@@ -23,8 +23,10 @@ class MongodbPipeline:
 
     def __init__(self):
         # you can set env variable in your shell with: export MY_API_KEY="your_api_key_here"
-        self.connection_code = os.environ.get('Mongodb_key')
-        # self.connection_code = os.environ.get('Mongodb_connection_code')
+        self.connection_code = os.environ.get('Mongodb_connection_code')
+        # replace below line with self.connection_code = 'replace it with your Mongodb_connection_code in string
+        # format' if you are using crontab job scheduler since it is unstable to have access to env variable even if
+        # we add it in the shell script
 
     def open_spider(self, spider):
         self.client = pymongo.MongoClient(self.connection_code)

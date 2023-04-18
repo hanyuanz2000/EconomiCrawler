@@ -46,7 +46,7 @@ class SequoiaCapitalSpider(CrawlSpider):
         now_aware = now.replace(tzinfo=pytz.UTC)
 
         # Check if the article is within a week
-        if now_aware - article_date <= timedelta(days=7):
+        if now_aware - article_date <= timedelta(days=365):
             # get title of article
             main_content = response.xpath('//main[@role="main"]')
             title = main_content.xpath('//h1/text()').get()
