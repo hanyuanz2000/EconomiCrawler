@@ -260,7 +260,7 @@ and then manually update them to MongoDB Atlas.
 Alternatively, you can explore other cloud database options.
 
 ## 7 Conclusion
-That's pretty much end of it. Hope this readme file can help you better understand the code.
+That's pretty much the end of it. Hope this readme file can help you better understand the code.
 
 
 
