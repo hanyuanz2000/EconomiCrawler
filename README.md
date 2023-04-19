@@ -1,4 +1,4 @@
-# Scrape Economists Articles with Scrapy
+# EconomiCrawler
 This project encompasses the automation of web scraping utilizing Scrapy, 
 shell scripting, and the cron job scheduler.
 Our primary objective is to efficiently extract pertinent articles from The Economist,
